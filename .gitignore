@@ -1,0 +1,19 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Nunca versionar: contém valores reais de variáveis, incluindo credenciais
+# de terceiros passadas por TF_VAR_*. O arquivo de exemplo é o versionado.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Editores / SO
+.DS_Store
+.idea/
+.vscode/
