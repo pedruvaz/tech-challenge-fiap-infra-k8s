@@ -95,6 +95,35 @@ data "aws_iam_policy_document" "github_terraform_iam" {
     ]
     resources = ["*"]
   }
+
+  # A própria stack `base` também é aplicada por esta role, no pipeline deste
+  # repositório — e o PowerUserAccess nega IAM inteiro. Sem este bloco o `plan`
+  # da `base` morre no refresh do OIDC provider (`iam:GetOpenIDConnectProvider`
+  # → AccessDenied) e qualquer mudança no trust das roles falharia em
+  # `iam:UpdateAssumeRolePolicy`. O EKS Auto Mode também cria um OIDC provider
+  # próprio (IRSA), então o `apply` da `cluster` precisa das mesmas ações.
+  statement {
+    sid    = "ManageBaseStackIam"
+    effect = "Allow"
+    actions = [
+      "iam:CreateOpenIDConnectProvider",
+      "iam:GetOpenIDConnectProvider",
+      "iam:DeleteOpenIDConnectProvider",
+      "iam:UpdateOpenIDConnectProviderThumbprint",
+      "iam:AddClientIDToOpenIDConnectProvider",
+      "iam:RemoveClientIDFromOpenIDConnectProvider",
+      "iam:TagOpenIDConnectProvider",
+      "iam:UntagOpenIDConnectProvider",
+      "iam:ListOpenIDConnectProviderTags",
+      "iam:UpdateRole",
+      "iam:UpdateRoleDescription",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:TagPolicy",
+      "iam:UntagPolicy",
+      "iam:ListPolicyTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "github_terraform_iam" {
